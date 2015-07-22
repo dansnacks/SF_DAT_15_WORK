@@ -16,6 +16,8 @@ ncaab = pd.read_csv('https://raw.githubusercontent.com/dansnacks/SF_DAT_15_WORK/
 
 ncaab.dropna()
 
+measureables = ['Position','Height', 'Weight', 'PPG', 'RPG', 'APG', 'SPG', 'BPG', 'TPG', 'FG%', 'FT%', '3P%']
+
 ncaab[['Player', 'BPG', 'Drafted']][ncaab.Position=='C'].sort_index(by='Drafted')
 
 # explore data numerically, looking for differences between species
@@ -31,9 +33,32 @@ ncaab.groupby('Position', as_index=False).Height.mean().sort_index(by='Height', 
 #Average height by position for drafted players
 ncaab[['Height', 'Position']][ncaab['Drafted'] == 'Y'].groupby('Position', as_index=False).mean().sort_index(by='Height', ascending = False)
 
-# Plot histograms of wine servings by continent, 
+#Average stats by position
+ncaab.groupby('Position', as_index=False).mean().sort_index(by='Height', ascending = False)
+
+#Max stats by position for drafted players
+ncaab[ncaab.Drafted == 'Y'].groupby('Position').max()
+ncaab[['Height', 'APG'][ncaab.Drafted == 'N'].groupby('Position').max()
+
+ncaab[[measureables][ncaab.Drafted == 'N'].groupby('Position').max()
+
+
+
+ncaab[['Height', 'Weight', 'Position', 'BPG', 'RPG']][ncaab['Drafted'] == 'Y'].groupby('Position', as_index=False).mean().sort_index(by='Height', ascending = False)
+
+
+ncaab.groupby('Position', as_index=False).Height.max().sort_index(by='Height', ascending = False)
+
+
+ncaab.groupby('Position', 'Drafted').Height.mean().sort_index(by='Height')
+
+ncaab[[ncaab['Drafted'] == 'Y']].groupby('Position', as_index=False).mean()
+
+
+
+# Plot histograms of height by position, 
 # remember to share x and share y axis scales!
-ncaab.Height.hist(by=ncaab.Position)
+ncaab.Height.hist(by=ncaab.Position, sharex=True, sharey=True)
 
 def color_drafted(yesno):
     if yesno == 'Y':
@@ -63,8 +88,17 @@ ncaab.plot(x='Height', y='Weight', kind='scatter', alpha=0.3, c=colorposition)
 
 fig, axs = plt.subplots(1, 3, sharey=True)
 ncaab.plot(kind='scatter', x='Height', y='Weight', ax=axs[0], figsize=(16, 6))
-data.plot(kind='scatter', x='Radio', y='Sales', ax=axs[1])
-data.plot(kind='scatter', x='Newspaper', y='Sales', ax=axs[2])
+ncaab.plot(kind='scatter', x='RPG', y='Weight', ax=axs[1], figsize=(16, 6))
+ncaab.plot(kind='scatter', x='FG%', y='Weight', ax=axs[2], figsize=(16, 6))
+
+#scatter plot and regression vs Weight
+sns.pairplot(ncaab, x_vars=['RPG','BPG','FG%'], y_vars='Weight', size=4.5, aspect=0.7, kind='reg')
+sns.pairplot(ncaab, x_vars=['APG','SPG','FT%'], y_vars='Weight', size=4.5, aspect=0.7, kind='reg')
+
+
+sns.pairplot(ncaab, x_vars=['Height','RPG','FG%'], y_vars='Weight', size=4.5, aspect=0.7, kind='reg')
+
+
 
 
 '''
@@ -82,6 +116,7 @@ sns.pairplot(data, x_vars=['TV','Radio','Newspaper'], y_vars='Sales', size=4.5, 
 # include a "regression line"
 sns.pairplot(data, x_vars=['TV','Radio','Newspaper'], y_vars='Sales', size=4.5, aspect=0.7, kind='reg')
 '''
+#doesnt work
 columns= ncaab.columns
 sns.pairplot(ncaab[[ncaab.columns]][ncaab['Drafted'] == 'Y'], kind='reg')
 sns.heatmap(ncaab.corr())
