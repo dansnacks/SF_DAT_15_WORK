@@ -22,7 +22,7 @@ ncaab[['Player', 'BPG', 'Drafted']][ncaab.Position=='C'].sort_index(by='Drafted'
 
 # explore data numerically, looking for differences between species
 ncaab.describe()
-ncaab['Drafted' == 'Y'].describe()
+ncaab[['Drafted' == 'Y']].describe()
 ncaab.groupby('Position').Height.mean().sort_index(by='Height')
 iris.groupby('species')['sepal_length', 'sepal_width', 'petal_length', 'petal_width'].mean()
 iris.groupby('species').describe()
@@ -38,9 +38,12 @@ ncaab.groupby('Position', as_index=False).mean().sort_index(by='Height', ascendi
 
 #Max stats by position for drafted players
 ncaab[ncaab.Drafted == 'Y'].groupby('Position').max()
+
+ncaab[ncaab.Drafted=='N']['PPG'].max()
+
 ncaab[['Height', 'APG'][ncaab.Drafted == 'N'].groupby('Position').max()
 
-ncaab[[measureables][ncaab.Drafted == 'N'].groupby('Position').max()
+ncaab[[measureables]][ncaab.Drafted == 'N'].groupby('Position').max()
 
 
 
@@ -142,15 +145,8 @@ ncaab.Position
 
 import matplotlib.pyplot as plt
 from pandas.tools.plotting import parallel_coordinates
-features = [name for name in ncaab.columns]
+features = ['PPG', 'RPG', 'APG', 'SPG', 'BPG', 'TPG', 'FG%', '3P%', 'Position']
 ncaab_df = pd.DataFrame(ncaab, columns = features)
-ncaab_df['Position'] = ncaab.target_names[ncaab.target]
-parallel_coordinates(data=ncaab_df, class_column='Position', 
-                     colors=('#FF0054', '#FBD039', '#23C2BC'))
+parallel_coordinates(data=ncaab_df, class_column='Position')
 
 plt.figure()
-parallel_coordinates(data, 'Name')
-
-
-, color=['r','g','b','m','y','c','k','w','eeefff']
-
