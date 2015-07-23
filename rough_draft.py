@@ -22,7 +22,7 @@ ncaab[['Player', 'BPG', 'Drafted']][ncaab.Position=='C'].sort_index(by='Drafted'
 
 # explore data numerically, looking for differences between species
 ncaab.describe()
-ncaab[['Drafted' == 'Y']].describe()
+
 ncaab.groupby('Position').Height.mean().sort_index(by='Height')
 iris.groupby('species')['sepal_length', 'sepal_width', 'petal_length', 'petal_width'].mean()
 iris.groupby('species').describe()
@@ -40,6 +40,8 @@ ncaab.groupby('Position', as_index=False).mean().sort_index(by='Height', ascendi
 ncaab[ncaab.Drafted == 'Y'].groupby('Position').max()
 
 ncaab[ncaab.Drafted=='N']['PPG'].max()
+
+ncaab[ncaab.Drafted=='Y']['PPG'].max()
 
 ncaab[['Height', 'APG'][ncaab.Drafted == 'N'].groupby('Position').max()
 
@@ -130,23 +132,28 @@ df=pd.DataFrame(ncaab)
 g = sns.FacetGrid(df, col='Drafted')
 g.map_dataframe(lambda data, color: sns.heatmap(data.corr(), linewidths=0))
 
-
-'''
-from pandas.tools.plotting import parallel_coordinates
-# I'm going to convert to a pandas dataframe
-# Using a snippet of code we learned from one of Kevin's lectures!
-features = [name[:-5].title().replace(' ', '') for name in iris.feature_names]
-iris_df = pd.DataFrame(iris.data, columns = features)
-iris_df['Name'] = iris.target_names[iris.target]
-parallel_coordinates(data=iris_df, class_column='Name', 
-                     colors=('#FF0054', '#FBD039', '#23C2BC'))
-'''
-ncaab.Position
-
+#Parallel coordinates
 import matplotlib.pyplot as plt
 from pandas.tools.plotting import parallel_coordinates
 features = ['PPG', 'RPG', 'APG', 'SPG', 'BPG', 'TPG', 'FG%', '3P%', 'Position']
-ncaab_df = pd.DataFrame(ncaab, columns = features)
+ncaab_df = pd.DataFrame(ncaab[ncaab.Drafted=='N'][ncaab.Position!='F'][ncaab.Position!='G'], columns = features)
 parallel_coordinates(data=ncaab_df, class_column='Position')
+
+plt.figure()
+
+
+features = ['PPG', 'RPG', 'APG', 'SPG', 'BPG', 'TPG', 'FG%', '3P%', 'Position']
+ncaab_df = pd.DataFrame(ncaab[ncaab.Drafted=='Y'], columns = features)
+parallel_coordinates(data=ncaab_df, class_column='Position')
+
+plt.figure()
+
+#Parallel coordinates G Drafted/Not
+features = ['PPG', 'RPG', 'APG', 'SPG', 'BPG', 'TPG', 'FG%', '3P%', 'Drafted']
+ncaab_df = pd.DataFrame(ncaab[ncaab.Position=='G'], columns = features)
+parallel_coordinates(data=ncaab_df, class_column='Drafted')
+
+###standardize axes
+df.stdcolumn = (df.column - mean(df.column) ) / np.std(df.column) 
 
 plt.figure()
