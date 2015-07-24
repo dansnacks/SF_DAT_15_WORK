@@ -148,12 +148,35 @@ parallel_coordinates(data=ncaab_df, class_column='Position')
 
 plt.figure()
 
+###standardize axes
+ncaab['stdPPG'] = (ncaab.PPG - np.mean(ncaab.PPG) ) / np.std(ncaab.PPG) 
+ncaab['stdRPG'] = (ncaab.RPG - np.mean(ncaab.RPG) ) / np.std(ncaab.RPG) 
+ncaab['stdAPG'] = (ncaab.APG - np.mean(ncaab.APG) ) / np.std(ncaab.APG) 
+ncaab['stdSPG'] = (ncaab.SPG - np.mean(ncaab.SPG) ) / np.std(ncaab.SPG) 
+ncaab['stdBPG'] = (ncaab.BPG - np.mean(ncaab.BPG) ) / np.std(ncaab.BPG) 
+ncaab['stdTPG'] = (ncaab.TPG - np.mean(ncaab.TPG) ) / np.std(ncaab.TPG) 
+
+
 #Parallel coordinates G Drafted/Not
 features = ['PPG', 'RPG', 'APG', 'SPG', 'BPG', 'TPG', 'FG%', '3P%', 'Drafted']
 ncaab_df = pd.DataFrame(ncaab[ncaab.Position=='G'], columns = features)
 parallel_coordinates(data=ncaab_df, class_column='Drafted')
 
-###standardize axes
-df.stdcolumn = (df.column - mean(df.column) ) / np.std(df.column) 
+
+
+features = ['stdPPG', 'stdRPG', 'stdAPG', 'stdSPG', 'stdBPG', 'stdTPG', 'Position']
+ncaab_df = pd.DataFrame(ncaab[ncaab.Drafted=='Y'], columns = features)
+parallel_coordinates(data=ncaab_df, class_column='Position')
 
 plt.figure()
+
+features = ['stdPPG', 'stdRPG', 'stdAPG', 'stdSPG', 'stdBPG', 'stdTPG', 'Position']
+ncaab_df = pd.DataFrame(ncaab[ncaab.Drafted=='N'], columns = features)
+parallel_coordinates(data=ncaab_df, class_column='Position')
+
+plt.figure()
+
+
+
+
+
