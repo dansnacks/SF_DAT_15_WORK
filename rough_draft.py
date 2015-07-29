@@ -105,22 +105,6 @@ sns.pairplot(ncaab, x_vars=['Height','RPG','FG%'], y_vars='Weight', size=4.5, as
 
 
 
-
-'''
-from sklearn.linear_model import LinearRegression
-from sklearn.cross_validation import train_test_split
-from sklearn import metrics
-import statsmodels.formula.api as smf
-
-# visualization
-import seaborn as sns
-import matplotlib.pyplot as plt
-
-sns.pairplot(data, x_vars=['TV','Radio','Newspaper'], y_vars='Sales', size=4.5, aspect=0.7)
-
-# include a "regression line"
-sns.pairplot(data, x_vars=['TV','Radio','Newspaper'], y_vars='Sales', size=4.5, aspect=0.7, kind='reg')
-'''
 #doesnt work
 columns= ncaab.columns
 sns.pairplot(ncaab[[ncaab.columns]][ncaab['Drafted'] == 'Y'], kind='reg')
@@ -156,27 +140,57 @@ ncaab['stdSPG'] = (ncaab.SPG - np.mean(ncaab.SPG) ) / np.std(ncaab.SPG)
 ncaab['stdBPG'] = (ncaab.BPG - np.mean(ncaab.BPG) ) / np.std(ncaab.BPG) 
 ncaab['stdTPG'] = (ncaab.TPG - np.mean(ncaab.TPG) ) / np.std(ncaab.TPG) 
 
-
-#Parallel coordinates G Drafted/Not
-features = ['PPG', 'RPG', 'APG', 'SPG', 'BPG', 'TPG', 'FG%', '3P%', 'Drafted']
-ncaab_df = pd.DataFrame(ncaab[ncaab.Position=='G'], columns = features)
-parallel_coordinates(data=ncaab_df, class_column='Drafted')
-
-
-
-features = ['stdPPG', 'stdRPG', 'stdAPG', 'stdSPG', 'stdBPG', 'stdTPG', 'Position']
-ncaab_df = pd.DataFrame(ncaab[ncaab.Drafted=='Y'], columns = features)
-parallel_coordinates(data=ncaab_df, class_column='Position')
-
-plt.figure()
-
 features = ['stdPPG', 'stdRPG', 'stdAPG', 'stdSPG', 'stdBPG', 'stdTPG', 'Position']
 ncaab_df = pd.DataFrame(ncaab[ncaab.Drafted=='N'], columns = features)
 parallel_coordinates(data=ncaab_df, class_column='Position')
 
-plt.figure()
+
+#difference between drafted and not drafted C
+features = ['stdPPG', 'stdRPG', 'stdAPG', 'stdSPG', 'stdBPG', 'stdTPG', 'FG%', '3P%', 'Drafted']
+ncaab_df = pd.DataFrame(ncaab[ncaab.Position=='C'], columns = features)
+parallel_coordinates(data=ncaab_df, class_column='Drafted')
+
+ncaab[ncaab['Position'] == 'C'][ncaab['Drafted'] == 'Y'].mean() - ncaab[ncaab['Position'] == 'C'][ncaab['Drafted'] == 'N'].mean()
+
+#percentage better drafted vs undrafted C
+((ncaab[ncaab['Position'] == 'C'][ncaab['Drafted'] == 'Y'].mean()
+ - ncaab[ncaab['Position'] == 'C'][ncaab['Drafted'] == 'N'].mean()) * 100/ 
+ ncaab[ncaab['Position'] == 'C'][ncaab['Drafted'] == 'Y'].mean())
+
+#difference between drafted and not drafted PG
+features = ['stdPPG', 'stdRPG', 'stdAPG', 'stdSPG', 'stdBPG', 'stdTPG', 'FG%', '3P%', 'Drafted']
+ncaab_df = pd.DataFrame(ncaab[ncaab.Position=='PG'], columns = features)
+parallel_coordinates(data=ncaab_df, class_column='Drafted')
+
+ncaab[ncaab['Position'] == 'PG'][ncaab['Drafted'] == 'Y'].mean() - ncaab[ncaab['Position'] == 'PG'][ncaab['Drafted'] == 'N'].mean()
+
+#percentage better drafted vs undrafted PG
+((ncaab[ncaab['Position'] == 'PG'][ncaab['Drafted'] == 'Y'].mean()
+ - ncaab[ncaab['Position'] == 'PG'][ncaab['Drafted'] == 'N'].mean()) * 100/ 
+ ncaab[ncaab['Position'] == 'PG'][ncaab['Drafted'] == 'Y'].mean())
+
+ #difference between drafted and not drafted SG
+features = ['stdPPG', 'stdRPG', 'stdAPG', 'stdSPG', 'stdBPG', 'stdTPG', 'FG%', '3P%', 'Drafted']
+ncaab_df = pd.DataFrame(ncaab[ncaab.Position=='SG'], columns = features)
+parallel_coordinates(data=ncaab_df, class_column='Drafted')
+
+ncaab[ncaab['Position'] == 'SG'][ncaab['Drafted'] == 'Y'].mean() - ncaab[ncaab['Position'] == 'SG'][ncaab['Drafted'] == 'N'].mean()
+
+#percentage better drafted vs undrafted PG
+((ncaab[ncaab['Position'] == 'SG'][ncaab['Drafted'] == 'Y'].mean()
+ - ncaab[ncaab['Position'] == 'SG'][ncaab['Drafted'] == 'N'].mean()) * 100/ 
+ ncaab[ncaab['Position'] == 'SG'][ncaab['Drafted'] == 'Y'].mean())
+#Shows HUGE differences between drafted and undrafted players
+
+ncaab[ncaab['Position'] == 'C'][ncaab['Drafted'] == 'Y'].Player.count() 
+ncaab[ncaab['Position'] == 'PG'][ncaab['Drafted'] == 'Y'].Player.count() 
+ncaab[ncaab['Position'] == 'SG'][ncaab['Drafted'] == 'Y'].Player.count() 
+ncaab[ncaab['Position'] == 'PF'][ncaab['Drafted'] == 'Y'].Player.count() 
+ncaab[ncaab['Position'] == 'SF'][ncaab['Drafted'] == 'Y'].Player.count() 
+ncaab[ncaab['Position'] == 'G'][ncaab['Drafted'] == 'Y'].Player.count()
+ncaab[ncaab['Position'] == 'F'][ncaab['Drafted'] == 'Y'].Player.count()
 
 
-
-
-
+# Make dummy columns for each of the 6 regions
+for continent_ in ['AS', 'NA', 'EU', 'AF', 'SA', 'OC']:
+    drinks[continent_] = drinks['continent'] == continent_
