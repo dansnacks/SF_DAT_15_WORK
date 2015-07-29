@@ -140,13 +140,13 @@ ncaab['stdSPG'] = (ncaab.SPG - np.mean(ncaab.SPG) ) / np.std(ncaab.SPG)
 ncaab['stdBPG'] = (ncaab.BPG - np.mean(ncaab.BPG) ) / np.std(ncaab.BPG) 
 ncaab['stdTPG'] = (ncaab.TPG - np.mean(ncaab.TPG) ) / np.std(ncaab.TPG) 
 
-features = ['stdPPG', 'stdRPG', 'stdAPG', 'stdSPG', 'stdBPG', 'stdTPG', 'Position']
+features = ['stdyearposppg', 'stdyearposrpg', 'stdyearposapg', 'stdyearposspg', 'stdyearposbpg', 'stdyearpostpg', 'Position']
 ncaab_df = pd.DataFrame(ncaab[ncaab.Drafted=='N'], columns = features)
 parallel_coordinates(data=ncaab_df, class_column='Position')
 
 
 #difference between drafted and not drafted C
-features = ['stdPPG', 'stdRPG', 'stdAPG', 'stdSPG', 'stdBPG', 'stdTPG', 'FG%', '3P%', 'Drafted']
+features = ['stdyearposppg', 'stdyearposrpg', 'stdyearposapg', 'stdyearposspg', 'stdyearposbpg', 'stdyearpostpg', 'stdyearposfg', 'stdyearposft', 'Drafted']
 ncaab_df = pd.DataFrame(ncaab[ncaab.Position=='C'], columns = features)
 parallel_coordinates(data=ncaab_df, class_column='Drafted')
 
