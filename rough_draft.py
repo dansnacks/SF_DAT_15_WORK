@@ -176,7 +176,7 @@ parallel_coordinates(data=ncaab_df, class_column='Drafted')
 
 ncaab[ncaab['Position'] == 'SG'][ncaab['Drafted'] == 'Y'].mean() - ncaab[ncaab['Position'] == 'SG'][ncaab['Drafted'] == 'N'].mean()
 
-#percentage better drafted vs undrafted PG
+#percentage better drafted vs undrafted SG
 ((ncaab[ncaab['Position'] == 'SG'][ncaab['Drafted'] == 'Y'].mean()
  - ncaab[ncaab['Position'] == 'SG'][ncaab['Drafted'] == 'N'].mean()) * 100/ 
  ncaab[ncaab['Position'] == 'SG'][ncaab['Drafted'] == 'Y'].mean())
