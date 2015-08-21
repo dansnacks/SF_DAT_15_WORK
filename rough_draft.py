@@ -12,7 +12,7 @@ import numpy as np
 import seaborn as sns
 
 # read in the CSV file from a URL
-ncaab = pd.read_csv('https://raw.githubusercontent.com/dansnacks/SF_DAT_15_WORK/master/project_data.csv')
+ncaab = pd.read_csv('https://raw.githubusercontent.com/dansnacks/SF_DAT_15_WORK/master/moredata.csv')
 ncaab.dropna()
 
 measureables = ['Position','Height', 'Weight', 'PPG', 'RPG', 'APG', 'SPG', 'BPG', 'TPG', 'FG%', 'FT%', '3P%']
@@ -23,8 +23,9 @@ ncaab[['Player', 'BPG', 'Drafted']][ncaab.Position=='C'].sort_index(by='Drafted'
 ncaab.describe()
 
 ncaab.groupby('Position').Height.mean().sort_index(by='Height')
-iris.groupby('species')['sepal_length', 'sepal_width', 'petal_length', 'petal_width'].mean()
-iris.groupby('species').describe()
+
+#Percent drafted by position
+ncaab.groupby('Position').Drafted.mean()
 
 #Average height by position
 ncaab.groupby('Position', as_index=False).Height.mean().sort_index(by='Height', ascending = False)
@@ -205,5 +206,199 @@ ncaab[ncaab['Position'] == 'SF'][ncaab['Drafted'] == 1].Player.count()
 ncaab[ncaab['Position'] == 'G'][ncaab['Drafted'] == 1].Player.count()
 ncaab[ncaab['Position'] == 'F'][ncaab['Drafted'] == 1].Player.count()
 
+
+# fit a linear regression model and store the class predictions
+
+from sklearn.linear_model import LogisticRegression
+logreg = LogisticRegression()
+feature_cols = ['Height', 'Weight', 'PPG', 'RPG', 'APG', 'SPG', 'BPG', 'TPG', 'FG%', 'FT%', '3P%']
+X = ncaab[ncaab['Position'] == 'C'][feature_cols]
+y = ncaab[ncaab['Position'] == 'C']['Drafted']
+logreg.fit(X, y)
+assorted_pred_class = logreg.predict(X)
+
+assorted_pred_prob = logreg.predict_proba(X)[:, 1]
+
+#########################              Logistic Regression              #######################
+
+# model for PG
+feature_cols = ['PPG', 'APG', 'BPG']
+X = ncaab[ncaab['Position'] == 'PG'][feature_cols]
+y = ncaab[ncaab['Position'] == 'PG']['Drafted']
+
+from sklearn.cross_validation import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1)
+
+from sklearn.linear_model import LogisticRegression
+logreg = LogisticRegression()
+logreg.fit(X_train, y_train)
+
+preds = logreg.predict(X_test)
+print metrics.confusion_matrix(y_test, preds)
+
+#model for SG
+feature_cols = ['PPG', 'RPG', 'APG', 'TPG']
+X = ncaab[ncaab['Position'] == 'SG'][feature_cols]
+y = ncaab[ncaab['Position'] == 'SG']['Drafted']
+
+from sklearn.cross_validation import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1)
+
+from sklearn.linear_model import LogisticRegression
+logreg = LogisticRegression()
+logreg.fit(X_train, y_train)
+
+preds = logreg.predict(X_test)
+print metrics.confusion_matrix(y_test, preds)
+
+#model for PF
+feature_cols = ['PPG', 'RPG', 'SPG', 'TPG', '3P%']
+X = ncaab[ncaab['Position'] == 'PF'][feature_cols]
+y = ncaab[ncaab['Position'] == 'PF']['Drafted']
+
+from sklearn.cross_validation import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1)
+
+from sklearn.linear_model import LogisticRegression
+logreg = LogisticRegression()
+logreg.fit(X_train, y_train)
+
+preds = logreg.predict(X_test)
+print metrics.confusion_matrix(y_test, preds)
+
+#model for SF
+feature_cols = ['PPG', 'APG', 'SPG', 'TPG']
+X = ncaab[ncaab['Position'] == 'SF'][feature_cols]
+y = ncaab[ncaab['Position'] == 'SF']['Drafted']
+
+from sklearn.cross_validation import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1)
+
+from sklearn.linear_model import LogisticRegression
+logreg = LogisticRegression()
+logreg.fit(X_train, y_train)
+
+preds = logreg.predict(X_test)
+print metrics.confusion_matrix(y_test, preds)
+
+#model for C
+feature_cols = ['PPG', 'RPG', 'APG', 'SPG', 'BPG']
+X = ncaab[ncaab['Position'] == 'C'][feature_cols]
+y = ncaab[ncaab['Position'] == 'C']['Drafted']
+
+from sklearn.cross_validation import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1)
+
+from sklearn.linear_model import LogisticRegression
+logreg = LogisticRegression()
+logreg.fit(X_train, y_train)
+
+preds = logreg.predict(X_test)
+print metrics.confusion_matrix(y_test, preds)
+
+
+#overall model + confusion matrix
+feature_cols = ['PPG', 'RPG', 'APG', 'SPG', 'BPG', 'TPG', 'FG%', 'FT%', '3P%']
+X = ncaab[feature_cols]
+y = ncaab['Drafted']
+
+from sklearn.cross_validation import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1)
+
+from sklearn.linear_model import LogisticRegression
+logreg = LogisticRegression()
+logreg.fit(X_train, y_train)
+
+preds = logreg.predict(X_test)
+print metrics.confusion_matrix(y_test, preds)
+
+
+########################              Decision Tree             ########################
+
+from sklearn import tree
+import pandas as pd
+import numpy as np
+from sklearn.cross_validation import train_test_split
+from sklearn import metrics
+import matplotlib.pyplot as plt
+
+ncaabtree = ncaab[['PPG', 'RPG', 'APG', 'SPG', 'BPG', 'TPG', 'FG%', 'FT%', '3P%', 'Position', 'Drafted']]
+
+ncaabtree['Position'] = np.where(ncaabtree.Position == 'G', 1, ncaabtree.Position)
+ncaabtree['Position'] = np.where(ncaabtree.Position == 'F', 2, ncaabtree.Position)
+ncaabtree['Position'] = np.where(ncaabtree.Position == 'PG', 3, ncaabtree.Position)
+ncaabtree['Position'] = np.where(ncaabtree.Position == 'SG', 4, ncaabtree.Position)
+ncaabtree['Position'] = np.where(ncaabtree.Position == 'PF', 5, ncaabtree.Position)
+ncaabtree['Position'] = np.where(ncaabtree.Position == 'SF', 6, ncaabtree.Position)
+ncaabtree['Position'] = np.where(ncaabtree.Position == 'C', 7, ncaabtree.Position)
+
+Drafted = ncaabtree['Drafted']
+del ncaabtree['Drafted']
+
+X_train, X_test, y_train, y_test = train_test_split(ncaabtree,Drafted, random_state=1)
+
+datatree = tree.DecisionTreeClassifier(random_state=1, max_depth=5)
+
+datatree.fit(X_train, y_train)
+
+treefeatures = X_train.columns.tolist()
+
+datatree.classes_
+
+datatree.feature_importances_
+
+pd.DataFrame(zip(treefeatures, datatree.feature_importances_)).sort_index(by=1, ascending=False)
+
+preds = datatree.predict(X_test)
+
+metrics.accuracy_score(y_test, preds)
+
+pd.crosstab(y_test, preds, rownames=['actual'], colnames=['predicted'])
+
+probs = datatree.predict_proba(X_test)[:,1]
+
+metrics.roc_auc_score(y_test, probs)
+
+'''
+
+FINE-TUNING THE TREE
+
+'''
+from sklearn.cross_validation import cross_val_score
+from sklearn.grid_search import GridSearchCV
+
+datatree = tree.DecisionTreeClassifier(max_depth=3)
+np.mean(cross_val_score(datatree, ncaabtree, Drafted, cv=5, scoring='roc_auc'))
+
+datatree = tree.DecisionTreeClassifier(max_depth=10)
+np.mean(cross_val_score(datatree, ncaabtree, Drafted, cv=5, scoring='roc_auc'))
+
+# Conduct a grid search for the best tree depth
+datatree = tree.DecisionTreeClassifier(random_state=1)
+depth_range = range(1, 8)
+param_grid = dict(max_depth=depth_range)
+grid = GridSearchCV(datatree, param_grid, cv=5, scoring='roc_auc')
+grid.fit(ncaabtree, Drafted)
+
+# Check out the scores of the grid search
+grid_mean_scores = [result[1] for result in grid.grid_scores_]
+
+# Plot the results of the grid search
+plt.figure()
+plt.plot(depth_range, grid_mean_scores)
+plt.hold(True)
+plt.grid(True)
+plt.plot(grid.best_params_['max_depth'], grid.best_score_, 'ro', markersize=12, markeredgewidth=1.5,
+         markerfacecolor='None', markeredgecolor='r')
+
+best = grid.best_estimator_
+
+cross_val_score(best, ncaabtree, Drafted, cv=10, scoring='roc_auc').mean()
+
+from sklearn.linear_model import LogisticRegression
+logreg = LogisticRegression()
+datatree = tree.DecisionTreeClassifier(random_state=1, max_depth=2)
+
+cross_val_score(logreg, ncaabtree, Drafted, cv=10, scoring='roc_auc').mean()
 
 
