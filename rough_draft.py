@@ -103,11 +103,6 @@ sns.pairplot(ncaab, x_vars=['APG','SPG','FT%'], y_vars='Weight', size=4.5, aspec
 
 sns.pairplot(ncaab, x_vars=['Height','RPG','FG%'], y_vars='Weight', size=4.5, aspect=0.7, kind='reg')
 
-#doesnt work
-columns= ncaab.columns
-sns.pairplot(ncaab[[ncaab.columns]][ncaab['Drafted'] == 1], kind='reg')
-sns.heatmap(ncaab.corr())
-
 
 #heatmap for Drafted Y/N - next three lines
 df=pd.DataFrame(ncaab)
@@ -156,17 +151,9 @@ ncaab['stdSPG'] = (ncaab.SPG - np.mean(ncaab.SPG) ) / np.std(ncaab.SPG)
 ncaab['stdBPG'] = (ncaab.BPG - np.mean(ncaab.BPG) ) / np.std(ncaab.BPG) 
 ncaab['stdTPG'] = (ncaab.TPG - np.mean(ncaab.TPG) ) / np.std(ncaab.TPG) 
 
-features = ['stdyearposppg', 'stdyearposrpg', 'stdyearposapg', 'stdyearposspg', 'stdyearposbpg', 'stdyearpostpg', 'Position']
-ncaab_df = pd.DataFrame(ncaab[ncaab.Drafted== 0], columns = features)
-parallel_coordinates(data=ncaab_df, class_column='Position')
-
-
-#difference between drafted and not drafted C
-features = ['stdyearposppg', 'stdyearposrpg', 'stdyearposapg', 'stdyearposspg', 'stdyearposbpg', 'stdyearpostpg', 'stdyearposfg', 'stdyearposft', 'Drafted']
-ncaab_df = pd.DataFrame(ncaab[ncaab.Position=='C'], columns = features)
-parallel_coordinates(data=ncaab_df, class_column='Drafted')
-
 ncaab[ncaab['Position'] == 'C'][ncaab['Drafted'] == 1].mean() - ncaab[ncaab['Position'] == 'C'][ncaab['Drafted'] == 'N'].mean()
+
+#################          Difference Between Drafted and Non-Drafted    #################
 
 #percentage better drafted vs undrafted C
 ((ncaab[ncaab['Position'] == 'C'][ncaab['Drafted'] == 1].mean()
@@ -220,6 +207,7 @@ assorted_pred_class = logreg.predict(X)
 assorted_pred_prob = logreg.predict_proba(X)[:, 1]
 
 #########################              Logistic Regression              #######################
+from sklearn import metrics
 
 # model for PG
 feature_cols = ['PPG', 'APG', 'BPG']
@@ -282,7 +270,7 @@ preds = logreg.predict(X_test)
 print metrics.confusion_matrix(y_test, preds)
 
 #model for C
-feature_cols = ['PPG', 'RPG', 'APG', 'SPG', 'BPG']
+feature_cols = ['PPG', 'Rank', 'RPG', 'APG', 'SPG', 'BPG']
 X = ncaab[ncaab['Position'] == 'C'][feature_cols]
 y = ncaab[ncaab['Position'] == 'C']['Drafted']
 
@@ -322,7 +310,7 @@ from sklearn.cross_validation import train_test_split
 from sklearn import metrics
 import matplotlib.pyplot as plt
 
-ncaabtree = ncaab[['PPG', 'RPG', 'APG', 'SPG', 'BPG', 'TPG', 'FG%', 'FT%', '3P%', 'Position', 'Drafted']]
+ncaabtree = ncaab[['Rank', 'MIN', 'PPG', 'RPG', 'APG', 'SPG', 'BPG', 'TPG', 'FG%', 'FT%', '3P%', 'Position', 'Drafted']]
 
 ncaabtree['Position'] = np.where(ncaabtree.Position == 'G', 1, ncaabtree.Position)
 ncaabtree['Position'] = np.where(ncaabtree.Position == 'F', 2, ncaabtree.Position)
@@ -337,7 +325,7 @@ del ncaabtree['Drafted']
 
 X_train, X_test, y_train, y_test = train_test_split(ncaabtree,Drafted, random_state=1)
 
-datatree = tree.DecisionTreeClassifier(random_state=1, max_depth=5)
+datatree = tree.DecisionTreeClassifier(random_state=1, max_depth=3)
 
 datatree.fit(X_train, y_train)
 
@@ -367,11 +355,7 @@ FINE-TUNING THE TREE
 from sklearn.cross_validation import cross_val_score
 from sklearn.grid_search import GridSearchCV
 
-datatree = tree.DecisionTreeClassifier(max_depth=3)
-np.mean(cross_val_score(datatree, ncaabtree, Drafted, cv=5, scoring='roc_auc'))
 
-datatree = tree.DecisionTreeClassifier(max_depth=10)
-np.mean(cross_val_score(datatree, ncaabtree, Drafted, cv=5, scoring='roc_auc'))
 
 # Conduct a grid search for the best tree depth
 datatree = tree.DecisionTreeClassifier(random_state=1)
@@ -390,6 +374,11 @@ plt.hold(True)
 plt.grid(True)
 plt.plot(grid.best_params_['max_depth'], grid.best_score_, 'ro', markersize=12, markeredgewidth=1.5,
          markerfacecolor='None', markeredgecolor='r')
+         
+#best tree depth model
+datatree = tree.DecisionTreeClassifier(max_depth=3)
+np.mean(cross_val_score(datatree, ncaabtree, Drafted, cv=5, scoring='roc_auc'))
+
 
 best = grid.best_estimator_
 
