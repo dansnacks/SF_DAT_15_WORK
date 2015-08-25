@@ -15,8 +15,6 @@ import seaborn as sns
 ncaab = pd.read_csv('https://raw.githubusercontent.com/dansnacks/SF_DAT_15_WORK/master/moredata.csv')
 ncaab.dropna()
 
-measureables = ['Position','Height', 'Weight', 'PPG', 'RPG', 'APG', 'SPG', 'BPG', 'TPG', 'FG%', 'FT%', '3P%']
-
 ncaab[['Player', 'BPG', 'Drafted']][ncaab.Position=='C'].sort_index(by='Drafted')
 
 # explore data numerically, looking for differences between species
@@ -347,6 +345,8 @@ probs = datatree.predict_proba(X_test)[:,1]
 
 metrics.roc_auc_score(y_test, probs)
 
+
+print metrics.confusion_matrix(y_test, preds)
 '''
 
 FINE-TUNING THE TREE
@@ -374,11 +374,14 @@ plt.hold(True)
 plt.grid(True)
 plt.plot(grid.best_params_['max_depth'], grid.best_score_, 'ro', markersize=12, markeredgewidth=1.5,
          markerfacecolor='None', markeredgecolor='r')
+plt.xlabel('Number of Tree Levels')
+plt.ylabel('ROC AUC')
          
 #best tree depth model
 datatree = tree.DecisionTreeClassifier(max_depth=3)
 np.mean(cross_val_score(datatree, ncaabtree, Drafted, cv=5, scoring='roc_auc'))
 
+##### print metrics.confusion_matrix(y_test, preds)
 
 best = grid.best_estimator_
 
@@ -389,5 +392,13 @@ logreg = LogisticRegression()
 datatree = tree.DecisionTreeClassifier(random_state=1, max_depth=2)
 
 cross_val_score(logreg, ncaabtree, Drafted, cv=10, scoring='roc_auc').mean()
+
+#output the graph
+from sklearn import tree
+clf = tree.DecisionTreeClassifier()
+
+clf = clf.fit(X_train, y_train)
+tree.export_graphviz(clf, out_file='tree.dot', max_depth=3)  
+
 
 
